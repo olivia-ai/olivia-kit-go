@@ -26,6 +26,13 @@ type RequestMessage struct {
 	Locale      string                 `json:"locale"`
 }
 
+// ResponseMessage is the structure used to reply to the user through the websocket
+type ResponseMessage struct {
+	Content     string                 `json:"content"`
+	Tag         string                 `json:"tag"`
+	Information map[string]interface{} `json:"information"`
+}
+
 // NewClient creates a new Client by generating a random token, and setting english as the
 // default langauge.
 // You need to give a pointer of the information map of your client.
@@ -62,6 +69,7 @@ func (client *Client) Handshake() error {
 	bytes, err := json.Marshal(RequestMessage{
 		Type:        0,
 		Content:     "",
+		Token:       client.Token,
 		Information: *client.Information,
 	})
 	if err != nil {
@@ -74,6 +82,42 @@ func (client *Client) Handshake() error {
 	}
 
 	return nil
+}
+
+// SendMessage sends the given content to the websocket of Olivia and returns her response with
+// an error.
+func (client *Client) SendMessage(content string) (ResponseMessage, error) {
+	// Marshal the RequestMessage with type 1
+	message := RequestMessage{
+		Type:        1,
+		Content:     content,
+		Token:       client.Token,
+		Information: *client.Information,
+		Locale:      client.Locale,
+	}
+
+	bytes, err := json.Marshal(message)
+	if err != nil {
+		return ResponseMessage{}, err
+	}
+
+	// Write the message to the websocket
+	if err = client.Connection.WriteMessage(websocket.TextMessage, bytes); err != nil {
+		return ResponseMessage{}, err
+	}
+
+	_, bytes, err = client.Connection.ReadMessage()
+	if err != nil {
+		return ResponseMessage{}, err
+	}
+
+	// Unmarshal the json content of the message
+	var response ResponseMessage
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return ResponseMessage{}, err
+	}
+
+	return response, nil
 }
 
 // generateToken returns a random token of 50 characters
