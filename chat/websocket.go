@@ -37,51 +37,38 @@ type ResponseMessage struct {
 // default langauge.
 // You need to give a pointer of the information map of your client.
 // The host is also required with a boolean, if the SSL certificate is required.
-func NewClient(host string, ssl bool, information *map[string]interface{}) (Client, error) {
+func NewClient(host string, ssl bool, information *map[string]interface{}) (client Client, err error) {
 	// Initialite the scheme and the url
 	scheme := "ws"
 	if ssl {
 		scheme += "s"
 	}
 
-	url := fmt.Sprintf("%s://%s", scheme, host)
+	url := fmt.Sprintf("%s://%s/websocket", scheme, host)
 
 	// Create the websocket connection
 	connection, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
-		return Client{}, err
+		return
 	}
 
-	defer connection.Close()
-
-	return Client{
+	client = Client{
 		Information: information,
 		Locale:      "en",
 		Token:       generateToken(),
 		Connection:  connection,
 		Channel:     make(chan string),
-	}, nil
+	}
+
+	// Execute the handshake
+	err = client.handshake()
+
+	return
 }
 
-// Handshake performs the handshake request to the websocket
-func (client *Client) Handshake() error {
-	// Marshal the RequestMessage with type 0
-	bytes, err := json.Marshal(RequestMessage{
-		Type:        0,
-		Content:     "",
-		Token:       client.Token,
-		Information: *client.Information,
-	})
-	if err != nil {
-		return err
-	}
-
-	// Write the message to the websocket
-	if err = client.Connection.WriteMessage(websocket.TextMessage, bytes); err != nil {
-		return err
-	}
-
-	return nil
+// Close closes the websocket connection
+func (client *Client) Close() {
+	client.Connection.Close()
 }
 
 // SendMessage sends the given content to the websocket of Olivia and returns her response with
@@ -118,6 +105,27 @@ func (client *Client) SendMessage(content string) (ResponseMessage, error) {
 	}
 
 	return response, nil
+}
+
+// handshake performs the handshake request to the websocket
+func (client *Client) handshake() error {
+	// Marshal the RequestMessage with type 0
+	bytes, err := json.Marshal(RequestMessage{
+		Type:        0,
+		Content:     "",
+		Token:       client.Token,
+		Information: *client.Information,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Write the message to the websocket
+	if err = client.Connection.WriteMessage(websocket.TextMessage, bytes); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // generateToken returns a random token of 50 characters
