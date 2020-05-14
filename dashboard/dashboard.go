@@ -7,13 +7,6 @@ import (
 	"net/http"
 )
 
-// A Client will interact with the REST Api routes of Olivia
-type Client struct {
-	URL    string
-	Token  string
-	Locale string
-}
-
 // Data contains the data sent for the dashboard
 type Data struct {
 	Layers   Layers   `json:"layers"`
