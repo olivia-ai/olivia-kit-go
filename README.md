@@ -4,7 +4,7 @@
   <br>
 </h1>
 
-<h4 align="center">Olivia's kit for Golang</h4>
+<h4 align="center">📦 The Olivia Kit for Golang</h4>
 
 <p align="center">
   <a href="https://github.com/olivia-ai/olivia-kit-go/actions?query=workflow%3A%22Format+checker%22"><img src="https://github.com/olivia-ai/olivia-kit-go/workflows/Format%20checker/badge.svg"></a>
