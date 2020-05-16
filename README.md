@@ -6,8 +6,6 @@
 
 <h4 align="center">Olivia's kit for Golang</h4>
 
-# olivia-kit-go ![Format checker](https://github.com/olivia-ai/olivia-kit-go/workflows/Format%20checker/badge.svg) [![Godoc](https://godoc.org/github.com/olivia-ai/olivia?status.svg)](https://pkg.go.dev/github.com/olivia-ai/olivia-kit-go)
-
 <p align="center">
   <a href="https://github.com/olivia-ai/olivia-kit-go/actions?query=workflow%3A%22Format+checker%22"><img src="https://github.com/olivia-ai/olivia-kit-go/workflows/Format%20checker/badge.svg"></a>
   <a href="https://pkg.go.dev/github.com/olivia-ai/olivia-kit-go"><img src="https://godoc.org/github.com/olivia-ai/olivia?status.svg" alt="GoDoc"></a>
